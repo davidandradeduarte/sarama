@@ -382,6 +382,17 @@ func (b *Broker) FetchOffset(request *OffsetFetchRequest) (*OffsetFetchResponse,
 		return nil, err
 	}
 
+	for topic, partitions := range request.partitions {
+		if response.Blocks[topic] == nil {
+			response.Blocks[topic] = make(map[int32]*OffsetFetchResponseBlock)
+		}
+		for _, p := range partitions {
+			if response.Blocks[topic][p] == nil {
+				response.Blocks[topic][p] = &OffsetFetchResponseBlock{Offset: -1}
+			}
+		}
+	}
+
 	return response, nil
 }
 
